@@ -1,0 +1,84 @@
+version: '3'
+
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
+networks:
+  host:
+
+services:
+  prometheus:
+    user: root
+    image: prom/prometheus:v2.14.0
+    container_name: prometheus
+    hostname: prometheus
+    privileged: true
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/etc/prometheus/data
+      - /etc/localtime:/etc/localtime
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.time=365d'
+      - '--storage.tsdb.retention.size=150GB'
+      - '--storage.tsdb.path=/etc/prometheus/data/'
+      - '--web.enable-admin-api'
+    depends_on:
+      - alertmanager
+    ports:
+      - '9090:9090'
+    networks:
+      - host
+
+  node-exporter:
+    image: prom/node-exporter:v0.18.1
+    container_name: node-exporter
+    hostname: node-exporter
+    ports:
+      - '9100:9100'
+    volumes:
+      - /proc:/host/proc
+      - /sys:/host/sys
+      - /:/host/rootfs
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^(/rootfs|/host|)/(sys|proc|dev|host|etc)($$|/)"'
+      - '--collector.filesystem.ignored-fs-types="^(sys|proc|auto|cgroup|devpts|ns|au|fuse\.lxc|mqueue)(fs|)$$"'
+    networks:
+      - host
+
+  alertmanager:
+    image: prom/alertmanager:v0.19.0
+    container_name: alertmanager
+    hostname: alertmanager
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+      - /etc/localtime:/etc/localtime
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - '9093:9093'
+    networks:
+      - host
+
+  grafana:
+    user: root
+    image: grafana/grafana:6.5.0
+    container_name: grafana
+    hostname: grafana
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_PATHS_CONFIG=/etc/grafana/grafana.ini
+    depends_on:
+      - prometheus
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - host

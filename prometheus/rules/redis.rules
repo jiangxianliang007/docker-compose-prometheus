@@ -1,0 +1,30 @@
+groups:
+- name: RedisStatsAlert
+  rules:
+  - alert: Redis is down
+    expr: redis_up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Instance {{ $labels.instance }} Redis is down"
+      description: "Redis database is down. This requires immediate action!"
+
+  - alert: Redis linked too many clients
+    expr: redis_connected_clients / redis_config_maxclients * 100 > 80
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Instance {{ $labels.instance }} Redis linked clients too many"
+      description: "Redis linked clients too many. This requires immediate action!"
+
+  - alert: Out of memory
+    expr: 'redis_memory_used_bytes / redis_total_system_memory_bytes * 100 > 80'
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Instance {{ $labels.instance }} Redis Out of memory"
+      description: "Redis is running out of memory (> 80%)"
+    

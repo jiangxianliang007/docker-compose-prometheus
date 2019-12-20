@@ -1,0 +1,67 @@
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: ['172.19.233.184:9093']
+      # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "/etc/prometheus/rules/*.rules"
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['172.19.233.184:9090']
+
+  - job_name: 'node'
+    scrape_interval: 8s
+    static_configs:
+      - targets:
+         - 172.19.233.184:9100
+        #labels:
+        #  instance: test184
+
+#  - job_name: 'mysql'
+#    static_configs:
+#      - targets:
+#         - 172.19.233.184:9104
+#        labels:
+#          instance: testmysql
+
+#  - job_name: 'redis'
+#    static_configs:
+#      - targets:
+#         - 172.19.233.184:9121
+#        labels:
+#          instance: testredis
+
+#  - job_name: 'nginx'
+#    static_configs:
+#      - targets:
+#         - 172.19.233.184:9113
+
+#  - job_name: elasticsearch
+#    scrape_interval: 60s
+#    scrape_timeout:  30s
+#    metrics_path: "/metrics"
+#    static_configs:
+#    - targets:
+#      - 172.19.233.184:9114
+#      labels:
+#        service: elasticsearch
+#    relabel_configs:
+#    - source_labels: [__address__]
+#      regex: '(.*)\:9114'
+#      target_label:  'instance'
+#      replacement:   '$1'
