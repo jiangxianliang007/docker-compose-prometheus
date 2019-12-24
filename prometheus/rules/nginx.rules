@@ -1,0 +1,22 @@
+groups:
+- name: NginxHttpCodeStatsAlert
+  rules:
+  - alert: Nginx Error Request Code 5xx
+    expr: rate(nginx_server_requests{host!="*",code="5xx"}[5m]) > 100 
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Instance {{ $labels.instance }} Nginx error request too many"
+      description: "Nginx http code 5xx > 100 per second ,(current value is: {{ $value }})"
+
+  - alert: Nginx Error Request Code 4xx
+    expr: rate(nginx_server_requests{host!="*",code="4xx"}[5m]) > 100
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Instance {{ $labels.instance }} Nginx error request too many"
+      description: "Nginx http code 4xx > 100 per second ,(current value is: {{ $value }})"
+
+    

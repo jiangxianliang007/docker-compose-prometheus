@@ -57,7 +57,7 @@ groups:
       description: "SQL thread has stopped. This is usually because it cannot apply a SQL statement received from the master."
 
   - alert: Slave lagging behind Master
-    expr: rate(mysql_slave_status_seconds_behind_master[5m]) >30
+    expr: rate(mysql_slave_status_seconds_behind_master[5m]) > 30
     for: 1m
     labels:
       severity: warning
