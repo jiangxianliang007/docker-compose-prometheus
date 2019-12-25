@@ -1,0 +1,20 @@
+groups:
+- name: RabbitmqStatsAlert
+  rules:
+  - alert: RabbitmqDown
+    expr: rabbitmq_up == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Rabbitmq down (instance {{ $labels.instance }})"
+      description: "RabbitMQ node down VALUE = {{ $value }}"
+
+  - alert: TooManyConnections
+    expr: rabbitmq_connections > 1000
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Too many connections (instance {{ $labels.instance }})"
+      description: "RabbitMQ instance has too many connections (> 1000)  VALUE = {{ $value }}"

@@ -1,10 +1,10 @@
-# promethues、grafana 监控部署
+# prometheus、grafana 监控部署
 
 服务端通过 docker-compose 方式部署
 
 exporter 均使用 docker 方式运行
 
-promethues 配置文件中注释了 mysql、redis、nginx、elasticsearch 的 exporter , 需要自行开启。 
+prometheus 配置文件中注释了 mysql、redis、nginx、elasticsearch、rabbitmq 的 exporter , 需要自行开启。 
 
 
 ## 截止2019-12-20 使用版本均为最新
@@ -17,15 +17,19 @@ node-exporter:  v0.18.1
 ```
 
 ## 告警规则含有：
-1、主机资源 内存、硬盘、CPU 使用率
+1、主机资源 内存、硬盘、CPU 网卡进出口带宽
 
 2、redis 内存使用、连接数
 
-3、mysql 存活、连接数、qps、主从同步、同步延迟
+3、mysql 存活、连接数、QPS、主从同步、同步延迟
 
 4、elasticsearch 集群状态、节点数量
 
 5、nginx 5xx、4xx 状态码 
+
+6、rabbitmq 存活、连接数
+
+7、prometheus 动态更新配置是否生效
 
 ## node-exporter
 启动 node-exporter
@@ -119,5 +123,23 @@ docker run -d \
  --env NGINX_STATUS="http://172.19.233.184/vts_status/format/json" \
  sophos/nginx-vts-exporter
 ```
+参数解释：
+
+NGINX_STATUS：nginx 数据采集地址
 
 模板：https://grafana.com/grafana/dashboards/2949
+
+## rabbitmq-exporter
+启动 rabbitmq-exporter
+```
+docker run -d \
+ -p 9119:9419 \
+ -e RABBIT_URL="http://172.19.233.184:15672" \
+ --name=rabbitmq-exporter \
+ kbudde/rabbitmq-exporter 
+```
+参数解释：
+
+RABBIT_URL：rabbitmq 连接地址与端口
+
+模板：https://grafana.com/grafana/dashboards/4371

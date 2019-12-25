@@ -65,3 +65,8 @@ scrape_configs:
 #      regex: '(.*)\:9114'
 #      target_label:  'instance'
 #      replacement:   '$1'
+
+#  - job_name: 'rabbitmq'
+#    static_configs:
+#      - targets:
+#        - 172.19.233.184:9119
