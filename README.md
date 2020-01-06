@@ -143,3 +143,27 @@ docker run -d \
 RABBIT_URL：rabbitmq 连接地址与端口
 
 模板：https://grafana.com/grafana/dashboards/4371
+
+
+## process-exporter
+以监控nginx 进程为例, 先创建配置文件
+```
+vim process-name.yaml
+process_names:
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'nginx'
+```
+启动 process-exporter
+```
+docker run -d \
+ -p 9156:9256 \
+ --privileged \
+ -v /proc:/host/proc \
+ -v `pwd`:/config \
+ --name=process-exporter  \
+ ncabatoff/process-exporter \
+ --procfs /host/proc -config.path /config/process-name.yaml
+```
+
+模板：https://grafana.com/grafana/dashboards/4202

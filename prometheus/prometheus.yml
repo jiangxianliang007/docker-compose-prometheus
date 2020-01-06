@@ -70,3 +70,14 @@ scrape_configs:
 #    static_configs:
 #      - targets:
 #        - 172.19.233.184:9119
+
+  - job_name: 'process'
+    static_configs:
+      - targets:
+         - 172.19.233.184:9156
+    relabel_configs:
+    - source_labels: ['__address__']
+      separator:     ':'
+      regex:         '(.*):.*'
+      target_label:  'instance'
+      replacement:   '${1}'
