@@ -1,0 +1,24 @@
+groups:
+  - name: jvm-alerting
+    rules:
+
+    # 堆空间使用超过80%
+    - alert: heap-usage-too-much
+      expr: jvm_memory_bytes_used{area="heap"} / jvm_memory_bytes_max * 100 > 80
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "JVM Instance {{ $labels.instance }} memory usage > 80%"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been in status [heap usage > 80%] for more than 1 minutes. current usage ({{ $value }}%)"
+    
+
+    # 在5分钟里，Old GC花费时间超过70%
+    - alert: old-gc-time-too-much
+      expr: increase(jvm_gc_collection_seconds_sum{}[5m]) > 5 * 60 * 0.7
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "JVM Instance {{ $labels.instance }} Old GC time > 70% running time"
+        description: "{{ $labels.instance }} of job {{ $labels.job }} has been in status [Old GC time > 70% running time] for more"

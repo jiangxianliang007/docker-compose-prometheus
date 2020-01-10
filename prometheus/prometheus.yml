@@ -81,3 +81,8 @@ scrape_configs:
       regex:         '(.*):.*'
       target_label:  'instance'
       replacement:   '${1}'
+
+  - job_name: 'tomcat'
+    static_configs:
+      - targets:
+         - 172.19.233.184:9116

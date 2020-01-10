@@ -4,7 +4,7 @@
 
 exporter 均使用 docker 方式运行
 
-prometheus 配置文件中注释了 mysql、redis、nginx、elasticsearch、rabbitmq 的 exporter , 需要自行开启。 
+包含 node、mysql、redis、nginx、elasticsearch、rabbitmq、jvm 的 exporter 运行； 
 
 
 ## 截止2019-12-20 使用版本均为最新
@@ -30,6 +30,8 @@ node-exporter:  v0.18.1
 6、rabbitmq 存活、连接数
 
 7、prometheus 动态更新配置是否生效
+
+8、jvm 堆栈使用率、GC 时间
 
 ## node-exporter
 启动 node-exporter
@@ -167,3 +169,23 @@ docker run -d \
 ```
 
 模板：https://grafana.com/grafana/dashboards/4202
+
+## jmx_exporter
+以监控tomcat为例
+
+下载 jmx_exporter 
+```
+wget -P /usr/local/src/  https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.12.0/jmx_prometheus_javaagent-0.12.0.jar
+```
+在 tomcat 的 catalina.sh  脚本中加上如下配置，再启动tomcat
+
+```
+vim apache-tomcat-8.5.29/bin/catalina.sh
+
+JAVA_OPTS="-javaagent:/usr/local/src/jmx_prometheus_javaagent-0.12.0.jar=9116:/usr/local/src/tomcat.yml"
+```
+参数解释：
+
+javaagent：jmx_exporter jar 包路径、监听端口、配置文件（在configs可以获取）
+
+模板：https://grafana.com/grafana/dashboards/8563
