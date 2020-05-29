@@ -79,6 +79,8 @@ services:
     ports:
       - '3000:3000'
     volumes:
+      - ./configs/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       - grafana_data:/var/lib/grafana
+      - /etc/localtime:/etc/localtime
     networks:
       - host

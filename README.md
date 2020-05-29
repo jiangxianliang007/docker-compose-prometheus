@@ -2,6 +2,13 @@
 
 服务端通过 docker-compose 方式部署
 
+```
+git clone https://github.com/jiangxianliang007/docker-compose-prometheus.git
+cd docker-compose-prometheus
+docker-compose up -d
+```
+浏览器访问 服务器IP:3000 User:admin Password:admin  导入node-exporter 的 Dashboards 图表就显示服务端的数据了
+
 exporter 均使用 docker 方式运行
 
 包含 node、mysql、redis、nginx、elasticsearch、rabbitmq、jvm 的 exporter 运行； 
