@@ -11,7 +11,7 @@ docker-compose up -d
 
 exporter 均使用 docker 方式运行
 
-包含 node、mysql、redis、nginx、elasticsearch、rabbitmq、jvm 的 exporter 运行； 
+包含 node、mysql、redis、nginx、elasticsearch、rabbitmq、jvm、cadvisor 的 exporter 运行； 
 
 
 ## 截止2019-12-20 使用版本均为最新
@@ -196,3 +196,18 @@ JAVA_OPTS="-javaagent:/usr/local/src/jmx_prometheus_javaagent-0.12.0.jar=9116:/u
 javaagent：jmx_exporter jar 包路径、监听端口、配置文件（在configs可以获取）
 
 模板：https://grafana.com/grafana/dashboards/8563
+
+## cadvisor
+docker 容器监控
+```
+docker run  \
+ --volume=/:/rootfs:ro \
+ --volume=/var/run:/var/run:rw \
+ --volume=/sys:/sys:ro \
+ --volume=/var/lib/docker/:/var/lib/docker:ro \
+ --publish=8080:8080 \
+ --detach=true \
+ --name=cadvisor \
+ google/cadvisor:latest  
+```
+模板：https://grafana.com/grafana/dashboards/11277
