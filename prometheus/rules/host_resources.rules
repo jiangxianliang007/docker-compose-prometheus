@@ -1,59 +1,56 @@
 groups:
 - name: HostResources
   rules:
-
   - alert: NodeCpuUsage
-    expr: 100 - (avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
-    for: 5m
+    expr: 100 -avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)* 100 * on(instance) group_left(nodename) (node_uname_info) > 85
+    for: 10m
     labels:
-      severity: warning
+      severity: warning-ops
     annotations:
-      summary: "CPU Useage high"
-      description: "CPU for 5 minutes avg usaage exceeds 80% | [exporter info http://{{ $labels.instance }}/metrics]"
-      useage: "{{ $value }}%"
+      summary: "{{$labels.nodename}} CPU Useage high"
+      description: "{{$labels.nodename}} CPU for 5 minutes avg usaage exceeds 80% current {{$value}}% | [exporter info http://{{ $labels.instance }}/metrics]"
 
   - alert: NodeDataDiskUsage
-    expr: ceil((1 - (node_filesystem_avail_bytes{fstype=~"ext4|xfs"} / node_filesystem_size_bytes{fstype=~"ext4|xfs"})) * 100) > 80
+    expr: ceil((1 - (node_filesystem_avail_bytes{fstype=~"ext4|xfs"} / node_filesystem_size_bytes{fstype=~"ext4|xfs"})) * 100) * on(instance) group_left(nodename) (node_uname_info)  > 85
     for: 5m
     labels:
-      severity: warning
+      severity: warning-ops
     annotations:
-      summary: "{{$labels.instance}}: High Disk usage detected"
-      description:  "{{$labels.instance}} data disk usage is above 80% current {{$value}}%"
+      summary: "{{$labels.instance}} {{$labels.nodename}}: High Disk usage detected"
+      description:  "{{$labels.instance}} {{$labels.nodename}} data disk usage is above 85% (current value is:{{$value}})"
 
   - alert: UnusualDiskWriteRate
-    expr: sum by (instance) (irate(node_disk_written_bytes_total[2m])) / 1024 / 1024 > 50
-    for: 5m
+    expr: sum by (instance) (irate(node_disk_written_bytes_total[2m])) / 1024 / 1024 * on(instance) group_left(nodename) (node_uname_info) > 100
+    for: 10m
     labels:
-      severity: warning
+      severity: warning-ops
     annotations:
-      summary: "Unusual disk write rate (instance {{ $labels.instance }})"
-      description: "Disk is probably writing too much data (> 50 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      summary: "Unusual disk write rate (instance {{ $labels.instance }}) {{$labels.nodename}}"
+      description: "{{$labels.nodename}} Disk is probably writing too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
 
   - alert: NodeMemoryUsage
-    expr: (node_memory_MemTotal_bytes - (node_memory_MemFree_bytes+node_memory_Buffers_bytes+node_memory_Cached_bytes )) / node_memory_MemTotal_bytes * 100 > 80
+    expr: (node_memory_MemTotal_bytes - (node_memory_MemFree_bytes+node_memory_Buffers_bytes+node_memory_Cached_bytes )) / node_memory_MemTotal_bytes * 100 * on(instance) group_left(nodename) (node_uname_info) > 85
     for: 5m
     labels:
-      user: jxl
-      severity: warning
+      severity: warning-ops
     annotations:
-      summary: "{{$labels.instance}}: High Memory usage detected"
-      description: "{{$labels.instance}}: Memory usage is above 80% (current value is:{{ $value }})"
+      summary: "{{$labels.instance}} {{$labels.nodename}}: High Memory usage detected"
+      description: "{{$labels.instance}} {{$labels.nodename}}: Memory usage is above 85% (current value:{{ $value }})\n"
 
   - alert: UnusualNetworkThroughputIn
-    expr: sum by (instance) (irate(node_network_receive_bytes_total[2m])) / 1024 / 1024 > 100
-    for: 5m
+    expr: sum by (instance) (irate(node_network_receive_bytes_total[2m])) / 1024 / 1024 * on(instance) group_left(nodename) (node_uname_info) > 100 
+    for: 10m
     labels:
-      severity: warning
+      severity: warning-ops
     annotations:
-      summary: "Unusual network throughput in (instance {{ $labels.instance }})"
-      description: "Host network interfaces are probably receiving too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      summary: "Unusual network throughput in (instance {{ $labels.instance }}) {{$labels.nodename}} "
+      description: "{{$labels.nodename}} Host network interfaces are probably receiving too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
 
   - alert: UnusualNetworkThroughputOut
-    expr: sum by (instance) (irate(node_network_transmit_bytes_total[2m])) / 1024 / 1024 > 100
-    for: 5m
+    expr: sum by (instance) (irate(node_network_transmit_bytes_total[2m])) / 1024 / 1024 * on(instance) group_left(nodename) (node_uname_info) > 100
+    for: 10m
     labels:
-      severity: warning
+      severity: warning-ops
     annotations:
-      summary: "Unusual network throughput out (instance {{ $labels.instance }})"
-      description: "Host network interfaces are probably sending too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      summary: "Unusual network throughput out (instance {{ $labels.instance }}) {{$labels.nodename}}"
+      description: "{{$labels.nodename}} Host network interfaces are probably sending too much data (> 100 MB/s)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
